@@ -15,7 +15,29 @@ def emotion_detector(text_to_analyze: str):
 
     response = requests.post(url=url, headers=headers, json=input_json)
 
-    # Watson NLP liefert JSON-String → in Dictionary umwandeln
+    # ➤ Fehlerbehandlung: z.B. leerer Text → status_code 400
+    if response.status_code == 400:
+        return {
+            "anger": None,
+            "disgust": None,
+            "fear": None,
+            "joy": None,
+            "sadness": None,
+            "dominant_emotion": None
+        }
+
+    # Optional: andere Fehler ähnlich behandeln
+    if response.status_code != 200:
+        return {
+            "anger": None,
+            "disgust": None,
+            "fear": None,
+            "joy": None,
+            "sadness": None,
+            "dominant_emotion": None
+        }
+
+    # Watson NLP liefert JSON-String → Dictionary
     result = json.loads(response.text)
 
     # Emotion Scores extrahieren
@@ -37,7 +59,7 @@ def emotion_detector(text_to_analyze: str):
     }
     dominant_emotion = max(emotion_scores, key=emotion_scores.get)
 
-    # Formatierte Ausgabe zurückgeben
+    # Formatierte Ausgabe
     return {
         "anger": anger_score,
         "disgust": disgust_score,
